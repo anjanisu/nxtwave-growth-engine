@@ -1,0 +1,41 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model College {
+  id              String         @id @default(uuid())
+  slug            String         @unique
+  name            String
+  city            String
+  state           String
+  coordinatorName String
+  channelType     String         // CLUB, COORDINATOR, FACULTY, WHATSAPP, PAID_ADS
+  createdAt       DateTime       @default(now())
+  registrations   Registration[]
+}
+
+model Registration {
+  id              String      @id @default(uuid())
+  studentName     String
+  email           String      @unique
+  whatsapp        String
+  collegeSlug     String
+  branch          String
+  graduationYear  Int
+  projectInterest String
+  college         College     @relation(fields: [collegeSlug], references: [slug], onDelete: Cascade)
+  attendance      Attendance?
+  registeredAt    DateTime    @default(now())
+}
+
+model Attendance {
+  id             String       @id @default(uuid())
+  registrationId String       @unique
+  registration   Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  attendedAt     DateTime     @default(now())
+}
